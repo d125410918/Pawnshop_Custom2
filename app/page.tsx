@@ -409,7 +409,6 @@ function Select(props: {
       <select
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
-        onBlur={props.onBlur}
         className="w-full rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20 placeholder:text-slate-500"
       >
         <option value="">請選擇</option>
