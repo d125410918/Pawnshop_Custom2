@@ -105,11 +105,10 @@ function cleanTaiwanId(value: string) {
 }
 
 function cleanNoChinese(value: string, maxLength: number) {
-  if (/[\u4e00-\u9fff]/.test(value)) {
-    return null;
-  }
-
-  return value.replace(/[^A-Za-z0-9._@\-\/\s]/g, "").slice(0, maxLength);
+  return value
+    .replace(/[\u4e00-\u9fff]/g, "")
+    .replace(/[^A-Za-z0-9._@\-\/\s]/g, "")
+    .slice(0, maxLength);
 }
 
 function cleanArea(value: string) {
@@ -158,14 +157,7 @@ export default function Home() {
   };
 
   const updateNoChinese = (key: keyof FormData, value: string, maxLength: number) => {
-    const cleaned = cleanNoChinese(value, maxLength);
-    if (cleaned === null) {
-      setMessage("此欄位不能輸入中文");
-      return;
-    }
-
-    setMessage("");
-    update(key, cleaned);
+    update(key, cleanNoChinese(value, maxLength));
   };
 
   const submit = async (e: React.FormEvent) => {
