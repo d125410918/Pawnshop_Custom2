@@ -156,7 +156,7 @@ export default function Home() {
     }));
   };
 
-  const updateNoChinese = (key: keyof FormData, value: string, maxLength: number) => {
+  const cleanNoChineseOnBlur = (key: keyof FormData, value: string, maxLength: number) => {
     update(key, cleanNoChinese(value, maxLength));
   };
 
@@ -241,7 +241,8 @@ export default function Home() {
             label="LINE ID"
             value={form.lineId}
             placeholder="不能輸入中文"
-            onChange={(v: string) => updateNoChinese("lineId", v, 50)}
+            onChange={(v: string) => update("lineId", v)}
+            onBlur={(e) => cleanNoChineseOnBlur("lineId", e.target.value, 50)}
           />
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -271,7 +272,8 @@ export default function Home() {
             label="任職年資"
             value={form.workYears}
             placeholder="不能輸入中文，例如 2Y3M 或 2-3"
-            onChange={(v: string) => updateNoChinese("workYears", v, 20)}
+            onChange={(v: string) => update("workYears", v)}
+            onBlur={(e) => cleanNoChineseOnBlur("workYears", e.target.value, 20)}
           />
 
           <Select
@@ -368,6 +370,7 @@ function Input(props: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   type?: string;
   maxLength?: number;
   placeholder?: string;
@@ -382,6 +385,7 @@ function Input(props: {
         maxLength={props.maxLength}
         placeholder={props.placeholder}
         onChange={(e) => props.onChange(e.target.value)}
+        onBlur={props.onBlur}
         className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-900"
       />
       {props.note && (
@@ -403,6 +407,7 @@ function Select(props: {
       <select
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
+        onBlur={props.onBlur}
         className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-900"
       >
         <option value="">請選擇</option>
