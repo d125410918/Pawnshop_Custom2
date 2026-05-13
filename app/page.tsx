@@ -204,7 +204,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#071a38] bg-[radial-gradient(circle_at_top,_rgba(245,212,122,0.12),_transparent_40%)] p-4">
       <div className="mx-auto max-w-3xl rounded-3xl border border-[#d6a84f]/30 bg-[#0b1f42]/95 p-6 shadow-2xl shadow-black/50 backdrop-blur">
-        <h1 className="text-4xl font-bold tracking-[0.2em] text-[#f5d47a]">初審申請表</h1>
+        <h1 className="text-4xl font-bold tracking-[0.2em] text-[#f5d47a]">高雄徠鑫初審申請表</h1>
         <p className="mt-3 text-sm leading-7 text-slate-300">
           請照實填寫資料，送出後將由專人聯繫。
         </p>
