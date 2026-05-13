@@ -1,22 +1,23 @@
 "use client";
 
+import { upload } from "@vercel/blob/client";
 import { useState } from "react";
 
-type FormData = {
+type FormState = {
   name: string;
   birthDate: string;
   identityNumber: string;
   phone: string;
   lineId: string;
   city: string;
-  area: string;
+  district: string;
   jobType: string;
   workYears: string;
-  incomeRange: string;
-  hasPayrollOrLaborInsurance: string;
-  fundingAmountWan: string;
+  incomeLabel: string;
+  payrollInsurance: string;
+  fundingNeedWan: string;
   fundingPurpose: string;
-  pawnItem: string;
+  collateral: string;
   emergencyName: string;
   emergencyPhone: string;
   emergencyRelation: string;
@@ -24,21 +25,21 @@ type FormData = {
   agreePrivacy: boolean;
 };
 
-const initialForm: FormData = {
+const initialForm: FormState = {
   name: "",
   birthDate: "",
   identityNumber: "",
   phone: "",
   lineId: "",
   city: "",
-  area: "",
+  district: "",
   jobType: "",
   workYears: "",
-  incomeRange: "",
-  hasPayrollOrLaborInsurance: "",
-  fundingAmountWan: "",
+  incomeLabel: "",
+  payrollInsurance: "",
+  fundingNeedWan: "",
   fundingPurpose: "",
-  pawnItem: "",
+  collateral: "",
   emergencyName: "",
   emergencyPhone: "",
   emergencyRelation: "",
@@ -88,16 +89,11 @@ function isValidBirthDate(value: string) {
   if (year < 1911 || year > new Date().getFullYear()) return false;
 
   const d = new Date(year, month - 1, day);
-  return (
-    d.getFullYear() === year &&
-    d.getMonth() === month - 1 &&
-    d.getDate() === day
-  );
+  return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
 }
 
 function cleanDigits(value: string, maxLength: number) {
-  const next = value.replace(/\D/g, "");
-  return next.slice(0, maxLength);
+  return value.replace(/\D/g, "").slice(0, maxLength);
 }
 
 function cleanTaiwanId(value: string) {
@@ -111,7 +107,7 @@ function cleanNoChinese(value: string, maxLength: number) {
     .slice(0, maxLength);
 }
 
-function cleanArea(value: string) {
+function cleanDistrict(value: string) {
   return value.replace(/[^\u4e00-\u9fa5A-Za-z0-9\s\-]/g, "").slice(0, 30);
 }
 
@@ -121,68 +117,113 @@ function cleanPurpose(value: string) {
     .slice(0, 200);
 }
 
-function validate(form: FormData) {
+function isValidImage(file: File | null) {
+  if (!file) return false;
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return false;
+  return file.size <= 8 * 1024 * 1024;
+}
+
+function safeFileName(file: File, prefix: string) {
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const cleanPrefix = prefix.replace(/[^a-zA-Z0-9-_]/g, "");
+  return `customers/${cleanPrefix}-${Date.now()}.${ext}`;
+}
+
+function validate(
+  form: FormState,
+  selfieFile: File | null,
+  idCardFrontFile: File | null,
+  idCardBackFile: File | null
+) {
   if (!form.name.trim()) return "請填寫姓名";
   if (!isValidBirthDate(form.birthDate)) return "出生年月日請輸入 8 位西元日期，例如 19990101";
   if (!isValidTaiwanId(form.identityNumber)) return "請填寫正確的身分證字號";
   if (!/^09\d{8}$/.test(form.phone)) return "手機號碼格式不正確";
   if (!/^[A-Za-z0-9._@-]{2,50}$/.test(form.lineId)) return "LINE ID 格式不正確，不能輸入中文";
   if (!form.city) return "請選擇現居縣市";
-  if (!form.area.trim()) return "請填寫現居區域";
+  if (!form.district.trim()) return "請填寫現居區域";
   if (!form.jobType) return "請選擇工作類型";
   if (!form.workYears.trim()) return "請填寫任職年資，不能輸入中文";
-  if (!form.incomeRange) return "請選擇月收入區間";
-  if (!form.hasPayrollOrLaborInsurance) return "請選擇是否有薪轉／勞保";
-  if (!/^\d{1,4}$/.test(form.fundingAmountWan)) return "資金需求請輸入數字，例如 5 代表 5 萬";
+  if (!form.incomeLabel) return "請選擇月收入區間";
+  if (!form.payrollInsurance) return "請選擇是否有薪轉／勞保";
+  if (!/^\d{1,4}$/.test(form.fundingNeedWan)) return "資金需求請輸入數字，例如 5 代表 5 萬";
   if (!/^[\u4e00-\u9fa5A-Za-z0-9\s，。,.、；;：:（）()\-／/]{2,200}$/.test(form.fundingPurpose)) return "資金用途格式不正確";
-  if (!form.pawnItem) return "請選擇當品";
+  if (!form.collateral) return "請選擇當品";
   if (!form.emergencyName.trim()) return "請填寫緊急聯絡人姓名";
   if (!/^09\d{8}$/.test(form.emergencyPhone)) return "緊急聯絡人電話格式不正確";
   if (!form.emergencyRelation.trim()) return "請填寫緊急聯絡人關係";
+  if (selfieFile && !isValidImage(selfieFile)) return "自拍照格式限 JPG、PNG、WEBP，大小 8MB 以內";
+  if (idCardFrontFile && !isValidImage(idCardFrontFile)) return "身分證正面格式限 JPG、PNG、WEBP，大小 8MB 以內";
+  if (idCardBackFile && !isValidImage(idCardBackFile)) return "身分證反面格式限 JPG、PNG、WEBP，大小 8MB 以內";
   if (!form.agreeFollowUp) return "請同意後續補件審核";
   if (!form.agreePrivacy) return "請同意個資蒐集與使用";
   return "";
 }
 
+async function uploadImage(file: File, prefix: string) {
+  const blob = await upload(safeFileName(file, prefix), file, {
+    access: "public",
+    handleUploadUrl: "/api/upload",
+  });
+
+  if (!blob.url) {
+    throw new Error("圖片上傳失敗");
+  }
+
+  return blob.url;
+}
+
 export default function Home() {
-  const [form, setForm] = useState<FormData>(initialForm);
+  const [form, setForm] = useState<FormState>(initialForm);
+  const [selfieFile, setSelfieFile] = useState<File | null>(null);
+  const [idCardFrontFile, setIdCardFrontFile] = useState<File | null>(null);
+  const [idCardBackFile, setIdCardBackFile] = useState<File | null>(null);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState("");
 
-  const update = (key: keyof FormData, value: string | boolean) => {
-    setForm((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+  const update = (key: keyof FormState, value: string | boolean) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const cleanNoChineseOnBlur = (key: keyof FormData, value: string, maxLength: number) => {
+  const cleanNoChineseOnBlur = (key: keyof FormState, value: string, maxLength: number) => {
     update(key, cleanNoChinese(value, maxLength));
   };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const error = validate(form);
+    const error = validate(form, selfieFile, idCardFrontFile, idCardBackFile);
     if (error) {
       setMessage(error);
       return;
     }
 
     setSending(true);
-    setMessage("");
+    setMessage("圖片上傳中，請勿關閉頁面...");
 
     try {
+      const [selfieUrl, idCardFrontUrl, idCardBackUrl] = await Promise.all([
+        selfieFile ? uploadImage(selfieFile, "selfie") : Promise.resolve(null),
+        idCardFrontFile ? uploadImage(idCardFrontFile, "id-front") : Promise.resolve(null),
+        idCardBackFile ? uploadImage(idCardBackFile, "id-back") : Promise.resolve(null),
+      ]);
+
+      setMessage("資料寫入中...");
+
       const res = await fetch("/api/applications", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           ...form,
-          fundingAmount: `${form.fundingAmountWan}萬`,
-          fullAddressArea: `${form.city}${form.area}`,
-        }),
+          incomeType: "monthly",
+          incomeAmount: null,
+          fundingNeed: `${form.fundingNeedWan}萬`,
+          selfieUrl,
+          idCardFrontUrl,
+          idCardBackUrl
+        })
       });
 
       const data = await res.json();
@@ -194,25 +235,33 @@ export default function Home() {
 
       setMessage("申請已送出，將由專人聯繫。");
       setForm(initialForm);
-    } catch {
-      setMessage("系統異常，請稍後再試");
+      setSelfieFile(null);
+      setIdCardFrontFile(null);
+      setIdCardBackFile(null);
+
+      const fileInputs = document.querySelectorAll<HTMLInputElement>('input[type="file"]');
+      fileInputs.forEach((input) => {
+        input.value = "";
+      });
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "系統異常，請稍後再試");
     } finally {
       setSending(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-[#071a38] bg-[radial-gradient(circle_at_top,_rgba(245,212,122,0.12),_transparent_40%)] p-4">
+    <main className="min-h-screen bg-[#071a38] bg-[radial-gradient(circle_at_top,_rgba(245,212,122,0.14),_transparent_40%)] p-4">
       <div className="mx-auto max-w-3xl rounded-3xl border border-[#d6a84f]/30 bg-[#0b1f42]/95 p-6 shadow-2xl shadow-black/50 backdrop-blur">
-        <h1 className="text-4xl font-bold tracking-[0.2em] text-[#f5d47a]">高雄徠鑫初審申請表</h1>
+        <h1 className="text-4xl font-bold tracking-[0.16em] text-[#f5d47a]">高雄來新當鋪</h1>
         <p className="mt-3 text-sm leading-7 text-slate-300">
-          請照實填寫資料，送出後將由專人聯繫。
+          請照實填寫資料。自拍與身分證照片可上傳，送出後將由專人聯繫。
         </p>
 
-        <div className="mt-6 h-px bg-gradient-to-r from-transparent via-[#d6a84f]/60 to-transparent"></div>
+        <div className="mt-6 h-px bg-gradient-to-r from-transparent via-[#d6a84f]/70 to-transparent" />
 
         <form onSubmit={submit} className="mt-6 grid gap-5">
-          <Input label="姓名" value={form.name} onChange={(v: string) => update("name", v.slice(0, 40))} />
+          <Input label="姓名" value={form.name} onChange={(v) => update("name", v.slice(0, 40))} />
 
           <Input
             label="出生年月日"
@@ -220,7 +269,7 @@ export default function Home() {
             maxLength={8}
             placeholder="例如 19990101"
             note="請輸入西元 8 位數字，例如 19990101。民國年請加 1911，例如民國 88 年 = 1999。年輸入四位後直接接著輸入月份與日期。"
-            onChange={(v: string) => update("birthDate", cleanDigits(v, 8))}
+            onChange={(v) => update("birthDate", cleanDigits(v, 8))}
           />
 
           <Input
@@ -228,7 +277,7 @@ export default function Home() {
             value={form.identityNumber}
             maxLength={10}
             placeholder="例如 A123456789"
-            onChange={(v: string) => update("identityNumber", cleanTaiwanId(v))}
+            onChange={(v) => update("identityNumber", cleanTaiwanId(v))}
           />
 
           <Input
@@ -236,37 +285,31 @@ export default function Home() {
             value={form.phone}
             maxLength={10}
             placeholder="例如 0912345678"
-            onChange={(v: string) => update("phone", cleanDigits(v, 10))}
+            onChange={(v) => update("phone", cleanDigits(v, 10))}
           />
 
           <Input
             label="LINE ID"
             value={form.lineId}
             placeholder="不能輸入中文"
-            onChange={(v: string) => update("lineId", v)}
+            onChange={(v) => update("lineId", v)}
             onBlur={(e) => cleanNoChineseOnBlur("lineId", e.target.value, 50)}
           />
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <Select
-              label="現居縣市"
-              value={form.city}
-              onChange={(v: string) => update("city", v)}
-              options={cities}
-            />
-
+          <div className="grid gap-5 md:grid-cols-2">
+            <Select label="現居縣市" value={form.city} onChange={(v) => update("city", v)} options={cities} />
             <Input
               label="現居區域"
-              value={form.area}
+              value={form.district}
               placeholder="例如 中山區"
-              onChange={(v: string) => update("area", cleanArea(v))}
+              onChange={(v) => update("district", cleanDistrict(v))}
             />
           </div>
 
           <Select
             label="工作類型"
             value={form.jobType}
-            onChange={(v: string) => update("jobType", v)}
+            onChange={(v) => update("jobType", v)}
             options={["正職", "兼職", "自營", "臨時工", "其他"]}
           />
 
@@ -274,78 +317,74 @@ export default function Home() {
             label="任職年資"
             value={form.workYears}
             placeholder="不能輸入中文，例如 2Y3M 或 2-3"
-            onChange={(v: string) => update("workYears", v)}
+            onChange={(v) => update("workYears", v)}
             onBlur={(e) => cleanNoChineseOnBlur("workYears", e.target.value, 20)}
           />
 
           <Select
             label="月收入區間"
-            value={form.incomeRange}
-            onChange={(v: string) => update("incomeRange", v)}
+            value={form.incomeLabel}
+            onChange={(v) => update("incomeLabel", v)}
             options={["2萬以下", "2萬至4萬", "4萬至6萬", "6萬以上"]}
           />
 
           <Select
             label="是否有薪轉／勞保"
-            value={form.hasPayrollOrLaborInsurance}
-            onChange={(v: string) => update("hasPayrollOrLaborInsurance", v)}
+            value={form.payrollInsurance}
+            onChange={(v) => update("payrollInsurance", v)}
             options={["都有", "只有薪轉", "只有勞保", "都沒有"]}
           />
 
-          <div>
-            <label className="block">
-              <span className="mb-2 block text-sm font-semibold tracking-wide text-[#f5d47a]">資金需求</span>
-              <div className="flex items-center overflow-hidden rounded-lg border border-slate-300 bg-white focus-within:border-slate-900">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={form.fundingAmountWan}
-                  maxLength={4}
-                  placeholder="例如 5"
-                  onChange={(e) => update("fundingAmountWan", cleanDigits(e.target.value, 4))}
-                  className="w-full px-3 py-2 outline-none"
-                />
-                <span className="border-l border-slate-300 px-3 py-2 text-slate-700">萬</span>
-              </div>
-            </label>
-          </div>
+          <label className="block">
+            <span className="mb-2 block text-sm font-semibold tracking-wide text-[#f5d47a]">資金需求</span>
+            <div className="flex items-center overflow-hidden rounded-xl border border-[#d6a84f]/30 bg-[#071a38] focus-within:border-[#f5d47a] focus-within:ring-2 focus-within:ring-[#f5d47a]/20">
+              <input
+                type="text"
+                inputMode="numeric"
+                value={form.fundingNeedWan}
+                maxLength={4}
+                placeholder="例如 5"
+                onChange={(e) => update("fundingNeedWan", cleanDigits(e.target.value, 4))}
+                className="w-full bg-transparent px-4 py-3 text-white outline-none placeholder:text-slate-500"
+              />
+              <span className="border-l border-[#d6a84f]/30 px-4 py-3 text-[#f5d47a]">萬</span>
+            </div>
+          </label>
 
           <Select
             label="選擇當品"
-            value={form.pawnItem}
-            onChange={(v: string) => update("pawnItem", v)}
+            value={form.collateral}
+            onChange={(v) => update("collateral", v)}
             options={["汽車", "機車", "無當", "其他"]}
           />
 
-          <TextArea label="資金用途" value={form.fundingPurpose} onChange={(v: string) => update("fundingPurpose", cleanPurpose(v))} />
+          <TextArea label="資金用途" value={form.fundingPurpose} onChange={(v) => update("fundingPurpose", cleanPurpose(v))} />
 
-          <Input label="緊急聯絡人姓名" value={form.emergencyName} onChange={(v: string) => update("emergencyName", v.slice(0, 40))} />
+          <Input label="緊急聯絡人姓名" value={form.emergencyName} onChange={(v) => update("emergencyName", v.slice(0, 40))} />
 
           <Input
             label="緊急聯絡人電話"
             value={form.emergencyPhone}
             maxLength={10}
             placeholder="例如 0912345678"
-            onChange={(v: string) => update("emergencyPhone", cleanDigits(v, 10))}
+            onChange={(v) => update("emergencyPhone", cleanDigits(v, 10))}
           />
 
-          <Input label="緊急聯絡人關係" value={form.emergencyRelation} onChange={(v: string) => update("emergencyRelation", v.slice(0, 20))} />
+          <Input label="緊急聯絡人關係" value={form.emergencyRelation} onChange={(v) => update("emergencyRelation", v.slice(0, 20))} />
+
+          <div className="grid gap-5 md:grid-cols-3">
+            <FileInput label="自拍照" file={selfieFile} onChange={setSelfieFile} />
+            <FileInput label="身分證正面" file={idCardFrontFile} onChange={setIdCardFrontFile} />
+            <FileInput label="身分證反面" file={idCardBackFile} onChange={setIdCardBackFile} />
+          </div>
 
           <label className="flex gap-3 rounded-2xl border border-[#d6a84f]/20 bg-[#071a38]/70 p-4 text-sm text-slate-200 shadow-lg shadow-black/20">
-            <input
-              type="checkbox"
-              checked={form.agreeFollowUp}
-              onChange={(e) => update("agreeFollowUp", e.target.checked)}
-            />
+            <input type="checkbox" checked={form.agreeFollowUp} onChange={(e) => update("agreeFollowUp", e.target.checked)} />
             <span>我同意後續審核時，依需求補充相關資料。</span>
           </label>
 
           <label className="flex gap-3 rounded-2xl border border-[#d6a84f]/20 bg-[#071a38]/70 p-4 text-sm text-slate-200 shadow-lg shadow-black/20">
-            <input
-              type="checkbox"
-              checked={form.agreePrivacy}
-              onChange={(e) => update("agreePrivacy", e.target.checked)}
-            />
+            <input type="checkbox" checked={form.agreePrivacy} onChange={(e) => update("agreePrivacy", e.target.checked)} />
             <span>本人同意基於申請審核、聯繫、資料確認之目的，蒐集並使用本人所提供之資料。</span>
           </label>
 
@@ -388,11 +427,9 @@ function Input(props: {
         placeholder={props.placeholder}
         onChange={(e) => props.onChange(e.target.value)}
         onBlur={props.onBlur}
-        className="w-full rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20 placeholder:text-slate-500"
+        className="w-full rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20"
       />
-      {props.note && (
-        <span className="mt-1 block text-xs leading-5 text-slate-500">{props.note}</span>
-      )}
+      {props.note && <span className="mt-2 block text-xs leading-5 text-slate-400">{props.note}</span>}
     </label>
   );
 }
@@ -409,13 +446,11 @@ function Select(props: {
       <select
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
-        className="w-full rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20 placeholder:text-slate-500"
+        className="w-full rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20"
       >
         <option value="">請選擇</option>
         {props.options.map((x) => (
-          <option key={x} value={x}>
-            {x}
-          </option>
+          <option key={x} value={x}>{x}</option>
         ))}
       </select>
     </label>
@@ -434,8 +469,29 @@ function TextArea(props: {
         rows={4}
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
-        className="w-full resize-none rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20 placeholder:text-slate-500"
+        className="w-full resize-none rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20"
       />
+    </label>
+  );
+}
+
+function FileInput(props: {
+  label: string;
+  file: File | null;
+  onChange: (file: File | null) => void;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-sm font-semibold tracking-wide text-[#f5d47a]">{props.label}</span>
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={(e) => props.onChange(e.target.files?.[0] || null)}
+        className="w-full rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-sm text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[#f5d47a] file:px-4 file:py-2 file:font-semibold file:text-[#071a38]"
+      />
+      <span className="mt-2 block text-xs leading-5 text-slate-400">
+        {props.file ? props.file.name : "可上傳，支援 JPG、PNG、WEBP，單張 8MB 以內。"}
+      </span>
     </label>
   );
 }
