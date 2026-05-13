@@ -298,13 +298,13 @@ export default function Home() {
 
           <div className="grid gap-5 md:grid-cols-2">
             <Select label="現居縣市" value={form.city} onChange={(v) => update("city", v)} options={cities} />
-<Input
-  label="現居區域"
-  value={form.district}
-  placeholder="例如 中山區"
-  onChange={(v) => update("district", v)}
-  onBlur={(e) => update("district", cleanDistrict(e.target.value))}
-/>
+            <Input
+              label="現居區域"
+              value={form.district}
+              placeholder="例如 中山區"
+              onChange={(v) => update("district", v)}
+              onBlur={(e) => update("district", cleanDistrict(e.target.value))}
+            />
           </div>
 
           <Select
@@ -359,8 +359,12 @@ export default function Home() {
             options={["汽車", "機車", "無當", "其他"]}
           />
 
-          <TextArea label="資金用途" value={form.fundingPurpose} onChange={(v) => update("fundingPurpose", v)}
-onBlur={(e) => update("fundingPurpose", cleanPurpose(e.target.value))} />
+          <TextArea
+            label="資金用途"
+            value={form.fundingPurpose}
+            onChange={(v) => update("fundingPurpose", v)}
+            onBlur={(e) => update("fundingPurpose", cleanPurpose(e.target.value))}
+          />
 
           <Input label="緊急聯絡人姓名" value={form.emergencyName} onChange={(v) => update("emergencyName", v.slice(0, 40))} />
 
@@ -463,6 +467,7 @@ function TextArea(props: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
 }) {
   return (
     <label className="block">
@@ -471,6 +476,7 @@ function TextArea(props: {
         rows={4}
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
+        onBlur={props.onBlur}
         className="w-full resize-none rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20"
       />
     </label>
