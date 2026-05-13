@@ -298,12 +298,13 @@ export default function Home() {
 
           <div className="grid gap-5 md:grid-cols-2">
             <Select label="現居縣市" value={form.city} onChange={(v) => update("city", v)} options={cities} />
-            <Input
-              label="現居區域"
-              value={form.district}
-              placeholder="例如 中山區"
-              onChange={(v) => update("district", cleanDistrict(v))}
-            />
+<Input
+  label="現居區域"
+  value={form.district}
+  placeholder="例如 中山區"
+  onChange={(v) => update("district", v)}
+  onBlur={(e) => update("district", cleanDistrict(e.target.value))}
+/>
           </div>
 
           <Select
@@ -358,7 +359,8 @@ export default function Home() {
             options={["汽車", "機車", "無當", "其他"]}
           />
 
-          <TextArea label="資金用途" value={form.fundingPurpose} onChange={(v) => update("fundingPurpose", cleanPurpose(v))} />
+          <TextArea label="資金用途" value={form.fundingPurpose} onChange={(v) => update("fundingPurpose", v)}
+onBlur={(e) => update("fundingPurpose", cleanPurpose(e.target.value))} />
 
           <Input label="緊急聯絡人姓名" value={form.emergencyName} onChange={(v) => update("emergencyName", v.slice(0, 40))} />
 
