@@ -347,9 +347,12 @@ export default function Home() {
 
           <FormSection number="03" title="資金需求">
             <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
-              <label className="block rounded-2xl border border-[#f5d47a]/60 bg-[#071a38]/90 p-4 shadow-[0_0_28px_rgba(245,212,122,0.12)]">
+              <label className="block rounded-2xl border border-[#f5d47a]/65 bg-[#071a38]/90 p-4 shadow-[0_0_30px_rgba(245,212,122,0.15)]">
                 <span className="mb-3 block text-sm font-bold tracking-wider text-[#f5d47a]">資金需求</span>
-                <div className="flex items-center overflow-hidden rounded-xl border border-[#d6a84f]/35 bg-[#031226] focus-within:border-[#f5d47a] focus-within:ring-2 focus-within:ring-[#f5d47a]/20">
+                <div className="flex items-stretch overflow-hidden rounded-2xl border border-[#f5d47a]/65 bg-[#031226] shadow-[inset_0_0_18px_rgba(0,0,0,0.45)] focus-within:border-[#ffe48a] focus-within:ring-2 focus-within:ring-[#f5d47a]/25">
+                  <span className="flex items-center border-r border-[#d6a84f]/35 bg-[#0b244d] px-4 text-3xl font-black tracking-tight text-[#f5d47a] sm:px-5 sm:text-4xl">
+                    NT$
+                  </span>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -357,9 +360,9 @@ export default function Home() {
                     maxLength={4}
                     placeholder="例如 5"
                     onChange={(e) => update("fundingNeedWan", cleanDigits(e.target.value, 4))}
-                    className="w-full bg-transparent px-4 py-4 text-xl font-bold text-white outline-none placeholder:text-slate-500"
+                    className="min-w-0 flex-1 bg-transparent px-4 py-4 text-2xl font-black text-white outline-none placeholder:text-slate-500 sm:text-3xl"
                   />
-                  <span className="border-l border-[#d6a84f]/30 px-5 py-4 text-lg font-black text-[#f5d47a]">萬</span>
+                  <span className="flex items-center border-l border-[#d6a84f]/35 px-5 py-4 text-lg font-black text-[#f5d47a]">萬</span>
                 </div>
               </label>
 
@@ -385,8 +388,8 @@ export default function Home() {
           <FormSection number="04" title="照片上傳">
             <div className="grid gap-5 md:grid-cols-3">
               <FileInput label="自拍照" file={selfieFile} onChange={setSelfieFile} />
-              <FileInput label="身分證正面" file={idCardFrontFile} onChange={setIdCardFrontFile} />
-              <FileInput label="身分證反面" file={idCardBackFile} onChange={setIdCardBackFile} />
+              <FileInput label="身分證正面（清晰可辨識）" file={idCardFrontFile} onChange={setIdCardFrontFile} />
+              <FileInput label="身分證反面（清晰可辨識）" file={idCardBackFile} onChange={setIdCardBackFile} />
             </div>
           </FormSection>
 
@@ -543,15 +546,26 @@ function FileInput(props: {
   return (
     <label className="block">
       <span className="mb-2 block text-sm font-bold tracking-wider text-[#f5d47a]">{props.label}</span>
-      <input
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        onChange={(e) => props.onChange(e.target.files?.[0] || null)}
-        className="w-full rounded-2xl border border-dashed border-[#d6a84f]/55 bg-[#031226]/70 px-4 py-5 text-sm text-white shadow-inner shadow-black/30 transition hover:border-[#f5d47a]/80 file:mr-4 file:rounded-xl file:border-0 file:bg-[#f5d47a] file:px-4 file:py-2 file:font-bold file:text-[#071a38]"
-      />
-      <span className="mt-2 block text-xs leading-5 text-slate-400">
-        {props.file ? props.file.name : "可上傳，支援 JPG、PNG、WEBP。"}
-      </span>
+      <div className="group relative flex min-h-[140px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#f5d47a]/85 bg-[#031226]/75 px-4 py-6 text-center shadow-[inset_0_0_22px_rgba(0,0,0,0.48),0_0_24px_rgba(245,212,122,0.10)] transition duration-200 hover:border-[#ffe48a] hover:bg-[#061936]/90 hover:shadow-[inset_0_0_22px_rgba(0,0,0,0.48),0_0_32px_rgba(245,212,122,0.18)]">
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={(e) => props.onChange(e.target.files?.[0] || null)}
+          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        />
+        <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-[#f5d47a]/55 bg-[#0b244d] text-3xl font-black text-[#f5d47a] shadow-lg shadow-black/30 transition group-hover:scale-105">
+          ＋
+        </span>
+        <span className="text-sm font-black tracking-wider text-[#f5d47a]">
+          點擊或拖曳檔案上傳
+        </span>
+        <span className="mt-2 text-xs leading-5 text-slate-300">
+          支援 JPG、PNG、WEBP
+        </span>
+        <span className="mt-3 line-clamp-2 max-w-full break-all text-xs leading-5 text-slate-400">
+          {props.file ? props.file.name : "尚未選擇檔案"}
+        </span>
+      </div>
     </label>
   );
 }
