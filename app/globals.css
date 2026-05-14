@@ -212,12 +212,13 @@ form > section:nth-of-type(5) input[type="checkbox"] {
   accent-color: #f5d47a;
 }
 
-/* 網站底部地址 */
-form::after {
+/* 網站底部地址：深藍框外 */
+main::after {
   content: "地址：802高雄市苓雅區中山二路308號";
   display: block;
-  margin-top: 1.5rem;
-  padding-top: 0.25rem;
+  max-width: 64rem;
+  margin: 1.25rem auto 0;
+  padding: 0 0.75rem;
   text-align: center;
   color: rgba(245, 212, 122, 0.82);
   font-size: 0.9rem;
