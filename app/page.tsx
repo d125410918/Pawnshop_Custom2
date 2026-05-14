@@ -263,11 +263,18 @@ export default function Home() {
             value={form.identityNumber}
             maxLength={10}
             placeholder="例如 A123456789"
-            inputMode="text"
+            inputMode="url"
             lang="en"
             autoCapitalize="characters"
+            autoComplete="off"
             autoCorrect="off"
             spellCheck={false}
+            pattern="[A-Za-z][12][0-9]{8}"
+            enterKeyHint="next"
+            onFocus={(e) => {
+              e.currentTarget.setAttribute("inputmode", "url");
+              e.currentTarget.setAttribute("lang", "en");
+            }}
             onChange={(v) => update("identityNumber", cleanTaiwanId(v))}
           />
 
@@ -402,6 +409,7 @@ function Input(props: {
   value: string;
   onChange: (value: string) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
   type?: string;
   maxLength?: number;
   placeholder?: string;
@@ -409,8 +417,11 @@ function Input(props: {
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   lang?: string;
   autoCapitalize?: string;
+  autoComplete?: string;
   autoCorrect?: string;
   spellCheck?: boolean;
+  pattern?: string;
+  enterKeyHint?: React.HTMLAttributes<HTMLInputElement>["enterKeyHint"];
 }) {
   return (
     <label className="block">
@@ -424,10 +435,14 @@ function Input(props: {
         inputMode={props.inputMode}
         lang={props.lang}
         autoCapitalize={props.autoCapitalize}
+        autoComplete={props.autoComplete}
         autoCorrect={props.autoCorrect}
         spellCheck={props.spellCheck}
+        pattern={props.pattern}
+        enterKeyHint={props.enterKeyHint}
         onChange={(e) => props.onChange(e.target.value)}
         onBlur={props.onBlur}
+        onFocus={props.onFocus}
         className="w-full rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20"
       />
       {props.note && <span className="mt-2 block text-xs leading-5 text-slate-400">{props.note}</span>}
