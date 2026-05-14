@@ -8,7 +8,7 @@ export default function GoldNumberBadge({ value }: GoldNumberBadgeProps) {
   const shadowId = `goldBadgeShadow-${value}`;
 
   return (
-    <span className="inline-flex shrink-0" aria-label={`第 ${value} 區`}>
+    <div className="inline-flex shrink-0" aria-label={`第 ${value} 區`}>
       <svg
         width="58"
         height="48"
@@ -110,6 +110,6 @@ export default function GoldNumberBadge({ value }: GoldNumberBadgeProps) {
           {value}
         </text>
       </svg>
-    </span>
+    </div>
   );
 }
