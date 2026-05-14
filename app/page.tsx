@@ -105,12 +105,6 @@ function cleanDistrict(value: string) {
   return value.replace(/[^\u4e00-\u9fa5A-Za-z0-9\s\-]/g, "").slice(0, 30);
 }
 
-function cleanPurpose(value: string) {
-  return value
-    .replace(/[^\u4e00-\u9fa5A-Za-z0-9\s，。,.、；;：:（）()\-／/]/g, "")
-    .slice(0, 200);
-}
-
 function isValidImage(file: File | null) {
   if (!file) return false;
   return ["image/jpeg", "image/png", "image/webp"].includes(file.type);
@@ -132,15 +126,15 @@ function validate(
   if (!isValidBirthDate(form.birthDate)) return "出生年月日請輸入 8 位西元日期，例如 19990101";
   if (!isValidTaiwanId(form.identityNumber)) return "請填寫正確的身分證字號";
   if (!/^09\d{8}$/.test(form.phone)) return "手機號碼格式不正確";
-  if (!/^[A-Za-z0-9._@-]{2,50}$/.test(form.lineId)) return "LINE ID 格式不正確，不能輸入中文";
+  if (!/^[A-Za-z0-9._@\-\/\s]{2,50}$/.test(form.lineId)) return "LINE ID 格式不正確，請輸入英文、數字或常用符號";
   if (!form.city) return "請選擇現居縣市";
   if (!form.district.trim()) return "請填寫現居區域";
   if (!form.jobType) return "請選擇工作類型";
-  if (!form.workYears.trim()) return "請填寫任職年資，不能輸入中文";
+  if (!form.workYears.trim()) return "請填寫任職年資";
   if (!form.incomeLabel) return "請選擇月收入區間";
   if (!form.payrollInsurance) return "請選擇是否有薪轉／勞保";
   if (!/^\d{1,4}$/.test(form.fundingNeedWan)) return "資金需求請輸入數字，例如 5 代表 5 萬";
-  if (!/^[\u4e00-\u9fa5A-Za-z0-9\s，。,.、；;：:（）()\-／/]{2,200}$/.test(form.fundingPurpose)) return "資金用途格式不正確";
+  if (!form.fundingPurpose.trim()) return "請填寫資金用途";
   if (!form.collateral) return "請選擇當品";
   if (selfieFile && !isValidImage(selfieFile)) return "自拍照格式限 JPG、PNG、WEBP";
   if (idCardFrontFile && !isValidImage(idCardFrontFile)) return "身分證正面格式限 JPG、PNG、WEBP";
@@ -175,8 +169,15 @@ export default function Home() {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const cleanNoChineseOnBlur = (key: keyof FormState, value: string, maxLength: number) => {
-    update(key, cleanNoChinese(value, maxLength));
+  const updateBirthDate = (value: string) => {
+    const cleaned = cleanDigits(value, 8);
+    update("birthDate", cleaned);
+
+    if (cleaned.length === 8) {
+      window.setTimeout(() => {
+        document.getElementById("identityNumberInput")?.focus();
+      }, 0);
+    }
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -259,14 +260,20 @@ export default function Home() {
             maxLength={8}
             placeholder="例如 19990101"
             note="請輸入西元 8 位數字，例如 19990101。民國年請加 1911，例如民國 88 年 = 1999。年輸入四位後直接接著輸入月份與日期。"
-            onChange={(v) => update("birthDate", cleanDigits(v, 8))}
+            onChange={updateBirthDate}
           />
 
           <Input
+            id="identityNumberInput"
             label="身分證字號"
             value={form.identityNumber}
             maxLength={10}
             placeholder="例如 A123456789"
+            inputMode="text"
+            lang="en"
+            autoCapitalize="characters"
+            autoCorrect="off"
+            spellCheck={false}
             onChange={(v) => update("identityNumber", cleanTaiwanId(v))}
           />
 
@@ -281,9 +288,13 @@ export default function Home() {
           <Input
             label="LINE ID"
             value={form.lineId}
-            placeholder="不能輸入中文"
-            onChange={(v) => update("lineId", v)}
-            onBlur={(e) => cleanNoChineseOnBlur("lineId", e.target.value, 50)}
+            placeholder="請輸入英文、數字或常用符號"
+            inputMode="url"
+            lang="en"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            onChange={(v) => update("lineId", cleanNoChinese(v, 50))}
           />
 
           <div className="grid gap-5 md:grid-cols-2">
@@ -307,9 +318,8 @@ export default function Home() {
           <Input
             label="任職年資"
             value={form.workYears}
-            placeholder="不能輸入中文，例如 2Y3M 或 2-3"
+            placeholder="例如 2年3個月"
             onChange={(v) => update("workYears", v)}
-            onBlur={(e) => cleanNoChineseOnBlur("workYears", e.target.value, 20)}
           />
 
           <Select
@@ -352,8 +362,9 @@ export default function Home() {
           <TextArea
             label="資金用途"
             value={form.fundingPurpose}
+            placeholder="請輸入資金用途"
+            lang="zh-Hant-TW"
             onChange={(v) => update("fundingPurpose", v)}
-            onBlur={(e) => update("fundingPurpose", cleanPurpose(e.target.value))}
           />
 
           <div className="grid gap-5 md:grid-cols-3">
@@ -392,6 +403,7 @@ export default function Home() {
 }
 
 function Input(props: {
+  id?: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
@@ -400,15 +412,26 @@ function Input(props: {
   maxLength?: number;
   placeholder?: string;
   note?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  lang?: string;
+  autoCapitalize?: string;
+  autoCorrect?: string;
+  spellCheck?: boolean;
 }) {
   return (
     <label className="block">
       <span className="mb-2 block text-sm font-semibold tracking-wide text-[#f5d47a]">{props.label}</span>
       <input
+        id={props.id}
         type={props.type || "text"}
         value={props.value}
         maxLength={props.maxLength}
         placeholder={props.placeholder}
+        inputMode={props.inputMode}
+        lang={props.lang}
+        autoCapitalize={props.autoCapitalize}
+        autoCorrect={props.autoCorrect}
+        spellCheck={props.spellCheck}
         onChange={(e) => props.onChange(e.target.value)}
         onBlur={props.onBlur}
         className="w-full rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20"
@@ -446,6 +469,8 @@ function TextArea(props: {
   value: string;
   onChange: (value: string) => void;
   onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
+  placeholder?: string;
+  lang?: string;
 }) {
   return (
     <label className="block">
@@ -453,6 +478,8 @@ function TextArea(props: {
       <textarea
         rows={4}
         value={props.value}
+        placeholder={props.placeholder}
+        lang={props.lang}
         onChange={(e) => props.onChange(e.target.value)}
         onBlur={props.onBlur}
         className="w-full resize-none rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20"
