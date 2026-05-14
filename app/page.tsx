@@ -18,9 +18,6 @@ type FormState = {
   fundingNeedWan: string;
   fundingPurpose: string;
   collateral: string;
-  emergencyName: string;
-  emergencyPhone: string;
-  emergencyRelation: string;
   agreeFollowUp: boolean;
   agreePrivacy: boolean;
 };
@@ -40,9 +37,6 @@ const initialForm: FormState = {
   fundingNeedWan: "",
   fundingPurpose: "",
   collateral: "",
-  emergencyName: "",
-  emergencyPhone: "",
-  emergencyRelation: "",
   agreeFollowUp: false,
   agreePrivacy: false,
 };
@@ -148,12 +142,9 @@ function validate(
   if (!/^\d{1,4}$/.test(form.fundingNeedWan)) return "資金需求請輸入數字，例如 5 代表 5 萬";
   if (!/^[\u4e00-\u9fa5A-Za-z0-9\s，。,.、；;：:（）()\-／/]{2,200}$/.test(form.fundingPurpose)) return "資金用途格式不正確";
   if (!form.collateral) return "請選擇當品";
-  if (!form.emergencyName.trim()) return "請填寫緊急聯絡人姓名";
-  if (!/^09\d{8}$/.test(form.emergencyPhone)) return "緊急聯絡人電話格式不正確";
-  if (!form.emergencyRelation.trim()) return "請填寫緊急聯絡人關係";
-if (selfieFile && !isValidImage(selfieFile)) return "自拍照格式限 JPG、PNG、WEBP";
-if (idCardFrontFile && !isValidImage(idCardFrontFile)) return "身分證正面格式限 JPG、PNG、WEBP";
-if (idCardBackFile && !isValidImage(idCardBackFile)) return "身分證反面格式限 JPG、PNG、WEBP";
+  if (selfieFile && !isValidImage(selfieFile)) return "自拍照格式限 JPG、PNG、WEBP";
+  if (idCardFrontFile && !isValidImage(idCardFrontFile)) return "身分證正面格式限 JPG、PNG、WEBP";
+  if (idCardBackFile && !isValidImage(idCardBackFile)) return "身分證反面格式限 JPG、PNG、WEBP";
   if (!form.agreeFollowUp) return "請同意後續補件審核";
   if (!form.agreePrivacy) return "請同意個資蒐集與使用";
   return "";
@@ -364,18 +355,6 @@ export default function Home() {
             onChange={(v) => update("fundingPurpose", v)}
             onBlur={(e) => update("fundingPurpose", cleanPurpose(e.target.value))}
           />
-
-          <Input label="緊急聯絡人姓名" value={form.emergencyName} onChange={(v) => update("emergencyName", v.slice(0, 40))} />
-
-          <Input
-            label="緊急聯絡人電話"
-            value={form.emergencyPhone}
-            maxLength={10}
-            placeholder="例如 0912345678"
-            onChange={(v) => update("emergencyPhone", cleanDigits(v, 10))}
-          />
-
-          <Input label="緊急聯絡人關係" value={form.emergencyRelation} onChange={(v) => update("emergencyRelation", v.slice(0, 20))} />
 
           <div className="grid gap-5 md:grid-cols-3">
             <FileInput label="自拍照" file={selfieFile} onChange={setSelfieFile} />
