@@ -172,12 +172,6 @@ export default function Home() {
   const updateBirthDate = (value: string) => {
     const cleaned = cleanDigits(value, 8);
     update("birthDate", cleaned);
-
-    if (cleaned.length === 8) {
-      window.setTimeout(() => {
-        document.getElementById("identityNumberInput")?.focus();
-      }, 0);
-    }
   };
 
   const submit = async (e: React.FormEvent) => {
