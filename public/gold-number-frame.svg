@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="170" viewBox="0 0 220 170" fill="none">
+  <defs>
+    <linearGradient id="goldMain" x1="35" y1="18" x2="188" y2="151" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff7c8"/>
+      <stop offset="0.18" stop-color="#f8d66f"/>
+      <stop offset="0.45" stop-color="#d19732"/>
+      <stop offset="0.68" stop-color="#835010"/>
+      <stop offset="1" stop-color="#ffe99e"/>
+    </linearGradient>
+    <radialGradient id="topShine" cx="74" cy="35" r="130" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.82"/>
+      <stop offset="0.22" stop-color="#fff0a6" stop-opacity="0.42"/>
+      <stop offset="0.47" stop-color="#f5d47a" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bottomShade" cx="160" cy="134" r="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3d2205" stop-opacity="0.42"/>
+      <stop offset="0.38" stop-color="#5b3508" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-24%" width="140%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#000000" flood-opacity="0.46"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#f5d47a" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#glow)">
+    <path d="M31 16H189L207 34V136L189 154H31L13 136V34L31 16Z" fill="url(#goldMain)" stroke="#fff2a8" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M31 16H189L207 34V136L189 154H31L13 136V34L31 16Z" fill="url(#topShine)" opacity="0.92"/>
+    <path d="M31 16H189L207 34V136L189 154H31L13 136V34L31 16Z" fill="url(#bottomShade)" opacity="0.9"/>
+
+    <path d="M41 25H179L196 42V128L179 145H41L24 128V42L41 25Z" fill="none" stroke="#3a2608" stroke-width="3.4" stroke-linejoin="round" opacity="0.82"/>
+    <path d="M50 34H170L187 51V119L170 136H50L33 119V51L50 34Z" fill="none" stroke="#fff3b0" stroke-width="2" stroke-linejoin="round" opacity="0.62"/>
+
+    <path d="M34 28H54L44 38H24" stroke="#2b1b05" stroke-width="3" stroke-linecap="round" opacity="0.58"/>
+    <path d="M186 28H166L176 38H196" stroke="#2b1b05" stroke-width="3" stroke-linecap="round" opacity="0.58"/>
+    <path d="M34 142H54L44 132H24" stroke="#2b1b05" stroke-width="3" stroke-linecap="round" opacity="0.58"/>
+    <path d="M186 142H166L176 132H196" stroke="#2b1b05" stroke-width="3" stroke-linecap="round" opacity="0.58"/>
+
+    <path d="M31 16H189L207 34V136L189 154H31L13 136V34L31 16Z" fill="none" stroke="#6b410c" stroke-width="1.4" stroke-linejoin="round" opacity="0.7"/>
+  </g>
+</svg>
