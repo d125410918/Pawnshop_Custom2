@@ -119,8 +119,7 @@ function cleanPurpose(value: string) {
 
 function isValidImage(file: File | null) {
   if (!file) return false;
-  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return false;
-  return file.size <= 8 * 1024 * 1024;
+  return ["image/jpeg", "image/png", "image/webp"].includes(file.type);
 }
 
 function safeFileName(file: File, prefix: string) {
@@ -152,9 +151,9 @@ function validate(
   if (!form.emergencyName.trim()) return "請填寫緊急聯絡人姓名";
   if (!/^09\d{8}$/.test(form.emergencyPhone)) return "緊急聯絡人電話格式不正確";
   if (!form.emergencyRelation.trim()) return "請填寫緊急聯絡人關係";
-  if (selfieFile && !isValidImage(selfieFile)) return "自拍照格式限 JPG、PNG、WEBP，大小 8MB 以內";
-  if (idCardFrontFile && !isValidImage(idCardFrontFile)) return "身分證正面格式限 JPG、PNG、WEBP，大小 8MB 以內";
-  if (idCardBackFile && !isValidImage(idCardBackFile)) return "身分證反面格式限 JPG、PNG、WEBP，大小 8MB 以內";
+if (selfieFile && !isValidImage(selfieFile)) return "自拍照格式限 JPG、PNG、WEBP";
+if (idCardFrontFile && !isValidImage(idCardFrontFile)) return "身分證正面格式限 JPG、PNG、WEBP";
+if (idCardBackFile && !isValidImage(idCardBackFile)) return "身分證反面格式限 JPG、PNG、WEBP";
   if (!form.agreeFollowUp) return "請同意後續補件審核";
   if (!form.agreePrivacy) return "請同意個資蒐集與使用";
   return "";
@@ -498,7 +497,7 @@ function FileInput(props: {
         className="w-full rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-sm text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[#f5d47a] file:px-4 file:py-2 file:font-semibold file:text-[#071a38]"
       />
       <span className="mt-2 block text-xs leading-5 text-slate-400">
-        {props.file ? props.file.name : "可上傳，支援 JPG、PNG、WEBP，單張 8MB 以內。"}
+        {props.file ? props.file.name : "可上傳，支援 JPG、PNG、WEBP。"}
       </span>
     </label>
   );
