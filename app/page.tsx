@@ -236,172 +236,208 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#071a38] bg-[radial-gradient(circle_at_top,_rgba(245,212,122,0.14),_transparent_40%)] p-4">
-      <div className="mx-auto max-w-3xl rounded-3xl border border-[#d6a84f]/30 bg-[#0b1f42]/95 p-6 shadow-2xl shadow-black/50 backdrop-blur">
-        <h1 className="brand-title text-center text-3xl leading-tight text-[#f5d47a] sm:text-4xl">
+    <main className="min-h-screen bg-[#06142c] bg-[radial-gradient(circle_at_top_left,_rgba(245,212,122,0.16),_transparent_34%),radial-gradient(circle_at_top_right,_rgba(45,102,180,0.24),_transparent_42%)] px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mx-auto max-w-5xl rounded-[28px] border border-[#d6a84f]/35 bg-[#081b3a]/95 p-5 shadow-2xl shadow-black/60 backdrop-blur sm:p-8">
+        <h1 className="brand-title text-3xl leading-tight text-[#f5d47a] sm:text-4xl">
           高雄徠鑫當鋪初審申請表
         </h1>
-        <p className="mt-3 text-sm leading-7 text-slate-300">
+        <p className="mt-4 text-sm leading-7 text-slate-200">
           請照實填寫資料。自拍與身分證照片可上傳，送出後將由專人聯繫。
         </p>
 
-        <div className="mt-6 h-px bg-gradient-to-r from-transparent via-[#d6a84f]/70 to-transparent" />
+        <form onSubmit={submit} className="mt-7 grid gap-5">
+          <FormSection number="01" title="基本資料">
+            <div className="grid gap-5 md:grid-cols-2">
+              <Input label="姓名" value={form.name} onChange={(v) => update("name", v.slice(0, 40))} />
 
-        <form onSubmit={submit} className="mt-6 grid gap-5">
-          <Input label="姓名" value={form.name} onChange={(v) => update("name", v.slice(0, 40))} />
-
-          <Input
-            label="出生年月日"
-            value={form.birthDate}
-            maxLength={8}
-            placeholder="例如 19990101"
-            note="請輸入西元 8 位數字，例如 19990101。民國年請加 1911，例如民國 88 年 = 1999。年輸入四位後直接接著輸入月份與日期。"
-            onChange={updateBirthDate}
-          />
-
-          <Input
-            id="identityNumberInput"
-            label="身分證字號"
-            value={form.identityNumber}
-            maxLength={10}
-            placeholder="例如 A123456789"
-            inputMode="url"
-            lang="en"
-            autoCapitalize="characters"
-            autoComplete="off"
-            autoCorrect="off"
-            spellCheck={false}
-            pattern="[A-Za-z][12][0-9]{8}"
-            enterKeyHint="next"
-            onFocus={(e) => {
-              e.currentTarget.setAttribute("inputmode", "url");
-              e.currentTarget.setAttribute("lang", "en");
-            }}
-            onChange={(v) => update("identityNumber", cleanTaiwanId(v))}
-          />
-
-          <Input
-            label="手機號碼"
-            value={form.phone}
-            maxLength={10}
-            placeholder="例如 0912345678"
-            onChange={(v) => update("phone", cleanDigits(v, 10))}
-          />
-
-          <Input
-            label="LINE ID"
-            value={form.lineId}
-            placeholder="請輸入英文、數字或常用符號"
-            inputMode="url"
-            lang="en"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
-            onChange={(v) => update("lineId", cleanNoChinese(v, 50))}
-          />
-
-          <div className="grid gap-5 md:grid-cols-2">
-            <Select label="現居縣市" value={form.city} onChange={(v) => update("city", v)} options={cities} />
-            <Input
-              label="現居區域"
-              value={form.district}
-              placeholder="例如 中山區"
-              onChange={(v) => update("district", v)}
-              onBlur={(e) => update("district", cleanDistrict(e.target.value))}
-            />
-          </div>
-
-          <Select
-            label="工作類型"
-            value={form.jobType}
-            onChange={(v) => update("jobType", v)}
-            options={["正職", "兼職", "自營", "臨時工", "其他"]}
-          />
-
-          <Input
-            label="任職年資"
-            value={form.workYears}
-            placeholder="例如 2年3個月"
-            onChange={(v) => update("workYears", v)}
-          />
-
-          <Select
-            label="月收入區間"
-            value={form.incomeLabel}
-            onChange={(v) => update("incomeLabel", v)}
-            options={["2萬以下", "2萬至4萬", "4萬至6萬", "6萬以上"]}
-          />
-
-          <Select
-            label="是否有薪轉／勞保"
-            value={form.payrollInsurance}
-            onChange={(v) => update("payrollInsurance", v)}
-            options={["都有", "只有薪轉", "只有勞保", "都沒有"]}
-          />
-
-          <label className="block">
-            <span className="mb-2 block text-sm font-semibold tracking-wide text-[#f5d47a]">資金需求</span>
-            <div className="flex items-center overflow-hidden rounded-xl border border-[#d6a84f]/30 bg-[#071a38] focus-within:border-[#f5d47a] focus-within:ring-2 focus-within:ring-[#f5d47a]/20">
-              <input
-                type="text"
-                inputMode="numeric"
-                value={form.fundingNeedWan}
-                maxLength={4}
-                placeholder="例如 5"
-                onChange={(e) => update("fundingNeedWan", cleanDigits(e.target.value, 4))}
-                className="w-full bg-transparent px-4 py-3 text-white outline-none placeholder:text-slate-500"
+              <Input
+                label="出生年月日"
+                value={form.birthDate}
+                maxLength={8}
+                placeholder="例如 19990101"
+                note="請輸入西元 8 位數字，例如 19990101。民國年請加 1911，例如民國 88 年 = 1999。"
+                onChange={updateBirthDate}
               />
-              <span className="border-l border-[#d6a84f]/30 px-4 py-3 text-[#f5d47a]">萬</span>
+
+              <Input
+                id="identityNumberInput"
+                label="身分證字號"
+                value={form.identityNumber}
+                maxLength={10}
+                placeholder="例如 A123456789"
+                inputMode="url"
+                lang="en"
+                autoCapitalize="characters"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                pattern="[A-Za-z][12][0-9]{8}"
+                enterKeyHint="next"
+                onFocus={(e) => {
+                  e.currentTarget.setAttribute("inputmode", "url");
+                  e.currentTarget.setAttribute("lang", "en");
+                }}
+                onChange={(v) => update("identityNumber", cleanTaiwanId(v))}
+              />
+
+              <Input
+                label="手機號碼"
+                value={form.phone}
+                maxLength={10}
+                placeholder="例如 0912345678"
+                onChange={(v) => update("phone", cleanDigits(v, 10))}
+              />
+
+              <div className="md:col-span-2">
+                <Input
+                  label="LINE ID"
+                  value={form.lineId}
+                  placeholder="請輸入英文、數字或常用符號"
+                  inputMode="url"
+                  lang="en"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  onChange={(v) => update("lineId", cleanNoChinese(v, 50))}
+                />
+              </div>
             </div>
-          </label>
+          </FormSection>
 
-          <Select
-            label="選擇當品"
-            value={form.collateral}
-            onChange={(v) => update("collateral", v)}
-            options={["汽車", "機車", "無當", "其他"]}
-          />
+          <FormSection number="02" title="居住與工作資料">
+            <div className="grid gap-5 md:grid-cols-2">
+              <Select label="現居縣市" value={form.city} onChange={(v) => update("city", v)} options={cities} />
+              <Input
+                label="現居區域"
+                value={form.district}
+                placeholder="例如 中山區"
+                onChange={(v) => update("district", v)}
+                onBlur={(e) => update("district", cleanDistrict(e.target.value))}
+              />
 
-          <TextArea
-            label="資金用途"
-            value={form.fundingPurpose}
-            placeholder="請輸入資金用途"
-            lang="zh-Hant-TW"
-            onChange={(v) => update("fundingPurpose", v)}
-          />
+              <Select
+                label="工作類型"
+                value={form.jobType}
+                onChange={(v) => update("jobType", v)}
+                options={["正職", "兼職", "自營", "臨時工", "其他"]}
+              />
 
-          <div className="grid gap-5 md:grid-cols-3">
-            <FileInput label="自拍照" file={selfieFile} onChange={setSelfieFile} />
-            <FileInput label="身分證正面" file={idCardFrontFile} onChange={setIdCardFrontFile} />
-            <FileInput label="身分證反面" file={idCardBackFile} onChange={setIdCardBackFile} />
-          </div>
+              <Input
+                label="任職年資"
+                value={form.workYears}
+                placeholder="例如 2年3個月"
+                onChange={(v) => update("workYears", v)}
+              />
 
-          <label className="flex gap-3 rounded-2xl border border-[#d6a84f]/20 bg-[#071a38]/70 p-4 text-sm text-slate-200 shadow-lg shadow-black/20">
-            <input type="checkbox" checked={form.agreeFollowUp} onChange={(e) => update("agreeFollowUp", e.target.checked)} />
-            <span>我同意後續審核時，依需求補充相關資料。</span>
-          </label>
+              <Select
+                label="月收入區間"
+                value={form.incomeLabel}
+                onChange={(v) => update("incomeLabel", v)}
+                options={["2萬以下", "2萬至4萬", "4萬至6萬", "6萬以上"]}
+              />
 
-          <label className="flex gap-3 rounded-2xl border border-[#d6a84f]/20 bg-[#071a38]/70 p-4 text-sm text-slate-200 shadow-lg shadow-black/20">
-            <input type="checkbox" checked={form.agreePrivacy} onChange={(e) => update("agreePrivacy", e.target.checked)} />
-            <span>本人同意基於申請審核、聯繫、資料確認之目的，蒐集並使用本人所提供之資料。</span>
-          </label>
+              <Select
+                label="是否有薪轉／勞保"
+                value={form.payrollInsurance}
+                onChange={(v) => update("payrollInsurance", v)}
+                options={["都有", "只有薪轉", "只有勞保", "都沒有"]}
+              />
+            </div>
+          </FormSection>
+
+          <FormSection number="03" title="資金需求">
+            <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+              <label className="block rounded-2xl border border-[#f5d47a]/60 bg-[#071a38]/90 p-4 shadow-[0_0_28px_rgba(245,212,122,0.12)]">
+                <span className="mb-3 block text-sm font-bold tracking-wider text-[#f5d47a]">資金需求</span>
+                <div className="flex items-center overflow-hidden rounded-xl border border-[#d6a84f]/35 bg-[#031226] focus-within:border-[#f5d47a] focus-within:ring-2 focus-within:ring-[#f5d47a]/20">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={form.fundingNeedWan}
+                    maxLength={4}
+                    placeholder="例如 5"
+                    onChange={(e) => update("fundingNeedWan", cleanDigits(e.target.value, 4))}
+                    className="w-full bg-transparent px-4 py-4 text-xl font-bold text-white outline-none placeholder:text-slate-500"
+                  />
+                  <span className="border-l border-[#d6a84f]/30 px-5 py-4 text-lg font-black text-[#f5d47a]">萬</span>
+                </div>
+              </label>
+
+              <div className="grid gap-5">
+                <Select
+                  label="選擇當品"
+                  value={form.collateral}
+                  onChange={(v) => update("collateral", v)}
+                  options={["汽車", "機車", "無當", "其他"]}
+                />
+
+                <TextArea
+                  label="資金用途"
+                  value={form.fundingPurpose}
+                  placeholder="請輸入資金用途"
+                  lang="zh-Hant-TW"
+                  onChange={(v) => update("fundingPurpose", v)}
+                />
+              </div>
+            </div>
+          </FormSection>
+
+          <FormSection number="04" title="照片上傳">
+            <div className="grid gap-5 md:grid-cols-3">
+              <FileInput label="自拍照" file={selfieFile} onChange={setSelfieFile} />
+              <FileInput label="身分證正面" file={idCardFrontFile} onChange={setIdCardFrontFile} />
+              <FileInput label="身分證反面" file={idCardBackFile} onChange={setIdCardBackFile} />
+            </div>
+          </FormSection>
+
+          <FormSection number="05" title="同意事項">
+            <div className="grid gap-4">
+              <label className="flex gap-3 rounded-2xl border border-[#d6a84f]/25 bg-[#071a38]/80 p-4 text-sm text-slate-200 shadow-lg shadow-black/20 transition hover:border-[#f5d47a]/45">
+                <input type="checkbox" checked={form.agreeFollowUp} onChange={(e) => update("agreeFollowUp", e.target.checked)} />
+                <span>我同意後續審核時，依需求補充相關資料。</span>
+              </label>
+
+              <label className="flex gap-3 rounded-2xl border border-[#d6a84f]/25 bg-[#071a38]/80 p-4 text-sm text-slate-200 shadow-lg shadow-black/20 transition hover:border-[#f5d47a]/45">
+                <input type="checkbox" checked={form.agreePrivacy} onChange={(e) => update("agreePrivacy", e.target.checked)} />
+                <span>本人同意基於申請審核、聯繫、資料確認之目的，蒐集並使用本人所提供之資料。</span>
+              </label>
+            </div>
+          </FormSection>
 
           {message && (
-            <div className="rounded-xl border border-[#d6a84f]/40 bg-black/30 px-4 py-3 text-sm text-[#f5d47a]">
+            <div className="rounded-2xl border border-[#d6a84f]/45 bg-black/35 px-5 py-4 text-sm font-semibold text-[#f5d47a] shadow-lg shadow-black/25">
               {message}
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={sending}
-            className="rounded-xl bg-gradient-to-r from-[#8b6914] via-[#f5d47a] to-[#8b6914] px-5 py-3 font-bold tracking-wider text-[#071a38] shadow-xl shadow-black/40 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {sending ? "送出中..." : "送出申請"}
-          </button>
+          <div className="flex justify-center pt-1">
+            <button
+              type="submit"
+              disabled={sending}
+              className="w-full max-w-sm rounded-2xl bg-gradient-to-r from-[#8b6914] via-[#ffe48a] to-[#8b6914] px-8 py-4 text-lg font-black tracking-[0.22em] text-[#071a38] shadow-[0_0_24px_rgba(245,212,122,0.32)] ring-1 ring-[#f5d47a]/50 transition duration-200 hover:scale-[1.01] hover:shadow-[0_0_34px_rgba(245,212,122,0.42)] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {sending ? "送出中..." : "送出申請"}
+            </button>
+          </div>
         </form>
       </div>
     </main>
+  );
+}
+
+function FormSection(props: { number: string; title: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-3xl border border-[#d6a84f]/45 bg-[#082047]/70 p-5 shadow-xl shadow-black/25 ring-1 ring-white/5 sm:p-6">
+      <div className="mb-5 flex items-center gap-3">
+        <span className="rounded-lg bg-gradient-to-b from-[#fff2a8] to-[#d6a84f] px-2.5 py-1 text-base font-black text-[#071a38] shadow-md shadow-black/30">
+          {props.number}
+        </span>
+        <h2 className="text-xl font-black tracking-[0.12em] text-[#f5d47a]">
+          {props.title}
+        </h2>
+      </div>
+      {props.children}
+    </section>
   );
 }
 
@@ -427,7 +463,7 @@ function Input(props: {
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-semibold tracking-wide text-[#f5d47a]">{props.label}</span>
+      <span className="mb-2 block text-sm font-bold tracking-wider text-[#f5d47a]">{props.label}</span>
       <input
         id={props.id}
         type={props.type || "text"}
@@ -445,7 +481,7 @@ function Input(props: {
         onChange={(e) => props.onChange(e.target.value)}
         onBlur={props.onBlur}
         onFocus={props.onFocus}
-        className="w-full rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20"
+        className="w-full rounded-xl border border-[#d6a84f]/35 bg-[#031226]/85 px-4 py-3 text-white shadow-inner shadow-black/30 outline-none transition duration-200 placeholder:text-slate-500 hover:border-[#d6a84f]/60 focus:border-[#f5d47a] focus:bg-[#061936] focus:ring-2 focus:ring-[#f5d47a]/20"
       />
       {props.note && <span className="mt-2 block text-xs leading-5 text-slate-400">{props.note}</span>}
     </label>
@@ -460,11 +496,11 @@ function Select(props: {
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-semibold tracking-wide text-[#f5d47a]">{props.label}</span>
+      <span className="mb-2 block text-sm font-bold tracking-wider text-[#f5d47a]">{props.label}</span>
       <select
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
-        className="w-full rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20"
+        className="w-full rounded-xl border border-[#d6a84f]/35 bg-[#031226]/85 px-4 py-3 text-white shadow-inner shadow-black/30 outline-none transition duration-200 hover:border-[#d6a84f]/60 focus:border-[#f5d47a] focus:bg-[#061936] focus:ring-2 focus:ring-[#f5d47a]/20"
       >
         <option value="">請選擇</option>
         {props.options.map((x) => (
@@ -485,7 +521,7 @@ function TextArea(props: {
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-semibold tracking-wide text-[#f5d47a]">{props.label}</span>
+      <span className="mb-2 block text-sm font-bold tracking-wider text-[#f5d47a]">{props.label}</span>
       <textarea
         rows={4}
         value={props.value}
@@ -493,7 +529,7 @@ function TextArea(props: {
         lang={props.lang}
         onChange={(e) => props.onChange(e.target.value)}
         onBlur={props.onBlur}
-        className="w-full resize-none rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#f5d47a] focus:ring-2 focus:ring-[#f5d47a]/20"
+        className="w-full resize-none rounded-xl border border-[#d6a84f]/35 bg-[#031226]/85 px-4 py-3 text-white shadow-inner shadow-black/30 outline-none transition duration-200 placeholder:text-slate-500 hover:border-[#d6a84f]/60 focus:border-[#f5d47a] focus:bg-[#061936] focus:ring-2 focus:ring-[#f5d47a]/20"
       />
     </label>
   );
@@ -506,12 +542,12 @@ function FileInput(props: {
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-semibold tracking-wide text-[#f5d47a]">{props.label}</span>
+      <span className="mb-2 block text-sm font-bold tracking-wider text-[#f5d47a]">{props.label}</span>
       <input
         type="file"
         accept="image/jpeg,image/png,image/webp"
         onChange={(e) => props.onChange(e.target.files?.[0] || null)}
-        className="w-full rounded-xl border border-[#d6a84f]/30 bg-[#071a38] px-4 py-3 text-sm text-white file:mr-4 file:rounded-lg file:border-0 file:bg-[#f5d47a] file:px-4 file:py-2 file:font-semibold file:text-[#071a38]"
+        className="w-full rounded-2xl border border-dashed border-[#d6a84f]/55 bg-[#031226]/70 px-4 py-5 text-sm text-white shadow-inner shadow-black/30 transition hover:border-[#f5d47a]/80 file:mr-4 file:rounded-xl file:border-0 file:bg-[#f5d47a] file:px-4 file:py-2 file:font-bold file:text-[#071a38]"
       />
       <span className="mt-2 block text-xs leading-5 text-slate-400">
         {props.file ? props.file.name : "可上傳，支援 JPG、PNG、WEBP。"}
