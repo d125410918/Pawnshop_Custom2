@@ -41,54 +41,52 @@ body {
   margin-left: 0.2em;
 }
 
-/* 01~05 區塊編號：嵌入金牌外框素材，再疊相近數字字體 */
+/* 01~05 區塊編號：直接嵌入裁切後的完整金牌圖片 */
 form > section > div:first-child > span:first-child {
-  width: 4.9rem;
-  height: 3.85rem;
-  min-width: 4.9rem;
-  min-height: 3.85rem;
-  padding: 0 0 0.08rem;
+  width: 5.15rem;
+  height: 4.15rem;
+  min-width: 5.15rem;
+  min-height: 4.15rem;
+  padding: 0;
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  position: relative;
-  isolation: isolate;
-  overflow: visible;
-
-  font-family: Georgia, "Times New Roman", "Noto Serif TC", serif;
-  font-size: 2.08rem !important;
-  font-weight: 700 !important;
-  line-height: 1;
-  letter-spacing: -0.08em;
-  color: #150f06 !important;
-
+  color: transparent !important;
+  text-shadow: none !important;
   border: 0 !important;
   border-radius: 0 !important;
-  background: none !important;
+  background-color: transparent !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
   box-shadow: none !important;
-  text-shadow:
-    1px 1px 0 rgba(255, 231, 143, 0.55),
-    -1px -1px 0 rgba(0, 0, 0, 0.46),
-    2px 3px 3px rgba(0, 0, 0, 0.48);
+  overflow: visible;
 }
 
-form > section > div:first-child > span:first-child::before {
-  content: "";
-  position: absolute;
-  inset: -0.32rem -0.45rem;
-  z-index: -1;
-  pointer-events: none;
-  background-image: url('/gold-number-frame.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100% 100%;
-  filter: drop-shadow(0 0 12px rgba(245, 212, 122, 0.42));
-}
-
+form > section > div:first-child > span:first-child::before,
 form > section > div:first-child > span:first-child::after {
   content: "";
-  display: none;
+  display: none !important;
+}
+
+form > section:nth-of-type(1) > div:first-child > span:first-child {
+  background-image: url('/gold-badge-01.svg') !important;
+}
+
+form > section:nth-of-type(2) > div:first-child > span:first-child {
+  background-image: url('/gold-badge-02.svg') !important;
+}
+
+form > section:nth-of-type(3) > div:first-child > span:first-child {
+  background-image: url('/gold-badge-03.svg') !important;
+}
+
+form > section:nth-of-type(4) > div:first-child > span:first-child {
+  background-image: url('/gold-badge-04.svg') !important;
+}
+
+form > section:nth-of-type(5) > div:first-child > span:first-child {
+  background-image: url('/gold-badge-05.svg') !important;
 }
 
 /* 03 資金需求：桌機左右各半，手機單欄，避免 NT$ 區塊撐出畫面 */
