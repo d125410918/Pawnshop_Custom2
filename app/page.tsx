@@ -239,7 +239,7 @@ export default function Home() {
     <main className="min-h-screen bg-[#06142c] bg-[radial-gradient(circle_at_top_left,_rgba(245,212,122,0.16),_transparent_34%),radial-gradient(circle_at_top_right,_rgba(45,102,180,0.24),_transparent_42%)] px-4 py-6 sm:px-6 sm:py-8">
       <div className="mx-auto max-w-5xl rounded-[28px] border border-[#d6a84f]/35 bg-[#081b3a]/95 p-5 shadow-2xl shadow-black/60 backdrop-blur sm:p-8">
         <h1 className="brand-title text-3xl leading-tight text-[#f5d47a] sm:text-4xl">
-          高雄徠鑫當鋪初審申請表
+          徠鑫當鋪初審申請表
         </h1>
         <p className="mt-4 text-sm leading-7 text-slate-200">
           請照實填寫資料。自拍與身分證照片可上傳，送出後將由專人聯繫。
