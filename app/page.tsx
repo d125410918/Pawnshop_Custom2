@@ -348,7 +348,7 @@ export default function Home() {
           <FormSection number="03" title="資金需求">
             <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
               <label className="block rounded-2xl border border-[#f5d47a]/65 bg-[#071a38]/90 p-4 shadow-[0_0_30px_rgba(245,212,122,0.15)]">
-                <span className="mb-3 block text-sm font-bold tracking-wider text-[#f5d47a]">資金需求</span>
+                <span className="mb-3 block text-sm font-bold tracking-wider text-[#f5d47a]">申請金額</span>
                 <div className="flex items-stretch overflow-hidden rounded-2xl border border-[#f5d47a]/65 bg-[#031226] shadow-[inset_0_0_18px_rgba(0,0,0,0.45)] focus-within:border-[#ffe48a] focus-within:ring-2 focus-within:ring-[#f5d47a]/25">
                   <span className="flex items-center border-r border-[#d6a84f]/35 bg-[#0b244d] px-4 text-3xl font-black tracking-tight text-[#f5d47a] sm:px-5 sm:text-4xl">
                     NT$
