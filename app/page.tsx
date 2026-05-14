@@ -1,6 +1,7 @@
 "use client";
 
 import { upload } from "@vercel/blob/client";
+import ImagePreviewInput from "./components/ImagePreviewInput";
 import { useState } from "react";
 
 type FormState = {
@@ -543,29 +544,5 @@ function FileInput(props: {
   file: File | null;
   onChange: (file: File | null) => void;
 }) {
-  return (
-    <label className="block">
-      <span className="mb-2 block text-sm font-bold tracking-wider text-[#f5d47a]">{props.label}</span>
-      <div className="group relative flex min-h-[140px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#f5d47a]/85 bg-[#031226]/75 px-4 py-6 text-center shadow-[inset_0_0_22px_rgba(0,0,0,0.48),0_0_24px_rgba(245,212,122,0.10)] transition duration-200 hover:border-[#ffe48a] hover:bg-[#061936]/90 hover:shadow-[inset_0_0_22px_rgba(0,0,0,0.48),0_0_32px_rgba(245,212,122,0.18)]">
-        <input
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => props.onChange(e.target.files?.[0] || null)}
-          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-        />
-        <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-[#f5d47a]/55 bg-[#0b244d] text-3xl font-black text-[#f5d47a] shadow-lg shadow-black/30 transition group-hover:scale-105">
-          ＋
-        </span>
-        <span className="text-sm font-black tracking-wider text-[#f5d47a]">
-          點擊或拖曳檔案上傳
-        </span>
-        <span className="mt-2 text-xs leading-5 text-slate-300">
-          支援 JPG、PNG、WEBP
-        </span>
-        <span className="mt-3 line-clamp-2 max-w-full break-all text-xs leading-5 text-slate-400">
-          {props.file ? props.file.name : "尚未選擇檔案"}
-        </span>
-      </div>
-    </label>
-  );
+  return <ImagePreviewInput label={props.label} file={props.file} onChange={props.onChange} />;
 }
