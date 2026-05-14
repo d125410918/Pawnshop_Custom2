@@ -104,6 +104,40 @@ form > section:nth-of-type(3) > div:nth-child(2) > label > div > span:last-child
   white-space: nowrap;
 }
 
+/* 04 照片上傳：讓選到的檔名更明顯，避免使用者以為沒有反應 */
+form > section:nth-of-type(4) label > div {
+  min-height: 10.5rem !important;
+  border-width: 3px !important;
+}
+
+form > section:nth-of-type(4) label > div > span:last-child {
+  width: 100%;
+  margin-top: 1rem !important;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(245, 212, 122, 0.42);
+  border-radius: 0.9rem;
+  background: rgba(245, 212, 122, 0.1);
+  color: #f5d47a !important;
+  font-size: 0.8rem !important;
+  font-weight: 800;
+  line-height: 1.45rem;
+  box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.22);
+}
+
+form > section:nth-of-type(4) label > div > span:last-child::before {
+  content: "目前狀態：";
+  color: #fff2a8;
+  font-weight: 900;
+}
+
+form > section:nth-of-type(4) label > div:focus-within,
+form > section:nth-of-type(4) label > div:hover {
+  border-color: #ffe48a !important;
+  box-shadow:
+    inset 0 0 22px rgba(0, 0, 0, 0.48),
+    0 0 34px rgba(245, 212, 122, 0.2) !important;
+}
+
 /* 05 同意事項：改成較大的舒適勾選卡片 */
 form > section:nth-of-type(5) label {
   cursor: pointer;
